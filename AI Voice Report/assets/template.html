@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>==BRAND_NAME== AI搜索声量分析报告 · ==REPORT_DATE==</title>
+<!--
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  报 告 生 成 前 检 查 清 单（必做）                     ║
+║                                                              ║
+║  □ 我已经读取了所有AI平台的原始测试数据文件                  ║
+║  □ 我已经分类统计了品牌专属题 vs 通用推荐题的数量            ║
+║  □ 我已经计算了通用推荐题的提及率（分子分母均确认）          ║
+║  □ 我已经识别了所有竞品品牌并收集了它们的提及数据            ║
+║  □ 我已经给每个AI平台打了一个综合分数（0-100）              ║
+║  □ 分数依据：60%提及率权重 + 40%回答质量/深度评估           ║
+║  □ 我已经准备好该品牌的名称、标语、报告年月、测试平台列表    ║
+║                                                              ║
+║  每完成一项，把 □ 替换为 ✅                                  ║
+╚══════════════════════════════════════════════════════════════╝
+-->
+<style>
+  :root {
+    --brand-red: #D92B2B;
+    --brand-dark: #1A1A2E;
+    --brand-gray: #6B7280;
+    --brand-light: #F8F9FA;
+    --accent-blue: #2563EB;
+    --accent-orange: #EA580C;
+    --accent-green: #16A34A;
+    --accent-yellow: #CA8A04;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #F0F2F5;
+    color: #1F2937;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .report-header {
+    background: linear-gradient(135deg, #1A1A2E 0%, #D92B2B 100%);
+    color: white;
+    padding: 48px 0 40px;
+    text-align: center;
+  }
+  .report-header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .report-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .report-header h1 span, .report-header h1 .brand-name { color: #FFBABA; }
+  .report-header p { font-size: 15px; opacity: 0.8; margin-top: 8px; }
+  .report-header .meta {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    font-size: 13px;
+    opacity: 0.75;
+  }
+  .report-header .meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* Layout */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section { margin: 32px 0; }
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--brand-red);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .num {
+    background: var(--brand-red);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* White card */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--brand-red);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Platform grid */
+  .platform-grid {
+    display: grid;
+    gap: 14px;
+  }
+  .platform-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .platform-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .platform-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .platform-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    position: relative;
+  }
+  .platform-name { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .platform-score-ring {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .platform-score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .platform-score-ring .score-text { font-size: 22px; font-weight: 800; color: var(--brand-dark); z-index: 1; }
+  .platform-score-ring .score-unit { font-size: 11px; color: var(--brand-gray); }
+  .platform-detail { font-size: 12px; color: var(--brand-gray); line-height: 1.6; }
+  .platform-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .tag-weak { background: #FEE2E2; color: #991B1B; }
+  .tag-mid { background: #FEF3C7; color: #92400E; }
+  .tag-ok { background: #DCFCE7; color: #166534; }
+
+  /* Query analysis table */
+  .query-table { width: 100%; border-collapse: collapse; }
+  .query-table th {
+    background: #F9FAFB;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-gray);
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap;
+  }
+  .query-table td {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+  }
+  .query-table tr:last-child td { border-bottom: none; }
+  .query-table tr:hover td { background: #F9FAFB; }
+  .mention-yes { color: #16A34A; font-weight: 700; }
+  .mention-no { color: #EF4444; font-weight: 700; }
+  .mention-partial { color: #EA580C; font-weight: 700; }
+
+  /* Two / Three columns */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Source note */
+  .source-note {
+    background: #F9FAFB;
+    border-left: 3px solid #D1D5DB;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--brand-gray);
+    margin-top: 16px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Insight box */
+  .insight-box {
+    background: linear-gradient(135deg, #1E3A5F, #D92B2B);
+    color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .insight-box h3 { font-size: 16px; margin-bottom: 12px; opacity: 0.9; }
+  .insight-box p { font-size: 14px; line-height: 1.8; opacity: 0.85; }
+
+  /* Warning / Alert / Info boxes */
+  .warn-box {
+    background: #FFFBEB;
+    border: 1px solid #FCD34D;
+    border-left: 4px solid #F59E0B;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #78350F;
+    margin-bottom: 12px;
+  }
+  .warn-box strong { color: #92400E; }
+  .alert-box {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-left: 4px solid #EF4444;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #7F1D1D;
+    margin-bottom: 12px;
+  }
+  .info-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-left: 4px solid #3B82F6;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #1E40AF;
+    margin-bottom: 12px;
+  }
+
+  .opp-card {
+    border: 1px solid #86EFAC;
+    background: #F0FDF4;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .opp-card h4 { font-size: 14px; font-weight: 700; color: #166534; margin-bottom: 8px; }
+  .opp-card p { font-size: 13px; color: #14532D; line-height: 1.7; }
+
+  /* Mini bar chart */
+  .mini-bar-chart { margin-top: 8px; }
+  .mini-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .mini-bar-label { width: 200px; font-size: 12px; color: var(--brand-gray); flex-shrink: 0; white-space: nowrap; }
+  .mini-bar-wrap { flex: 1; height: 16px; background: #F3F4F6; border-radius: 8px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 8px; }
+  .mini-bar-val { width: 40px; text-align: right; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .bar-target { background: linear-gradient(90deg, #9B1C1C, #D92B2B); }
+  .bar-comp1 { background: linear-gradient(90deg, #065F46, #059669); }
+  .bar-comp2 { background: linear-gradient(90deg, #1D4ED8, #3B82F6); }
+
+  /* Competitor table */
+  .comp-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  .comp-table th { background: #1E3A5F; color: white; padding: 8px 6px; font-size: 12px; text-align: center; white-space: nowrap; }
+  .comp-table th:first-child { text-align: left; padding-left: 10px; }
+  .comp-table td { padding: 8px 6px; font-size: 12px; border-bottom: 1px solid #F3F4F6; text-align: center; }
+  .comp-table td:first-child { text-align: left; font-weight: 600; padding-left: 10px; white-space: nowrap; }
+  .comp-table .target-row td { background: #FEE2E2 !important; color: var(--brand-red) !important; font-weight: 700; }
+
+  /* GEO action table */
+  .geo-table { width: 100%; border-collapse: collapse; }
+  .geo-table th { background: #1E3A5F; color: white; padding: 10px 14px; font-size: 13px; text-align: left; }
+  .geo-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  .geo-table tr:hover td { background: #F9FAFB; }
+  .priority-p0 { background: #FEE2E2; color: #991B1B; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .priority-p1 { background: #FEF3C7; color: #92400E; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .priority-p2 { background: #DCFCE7; color: #166534; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+
+  /* Phase roadmap - 纵向堆叠 */
+  .roadmap-grid { display: flex; flex-direction: column; gap: 14px; }
+  .roadmap-phase {
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .phase-1 { background: linear-gradient(135deg, #FEF2F2, #FEE2E2); border: 1px solid #FECACA; border-left: 4px solid #EF4444; }
+  .phase-2 { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border: 1px solid #FDE68A; border-left: 4px solid #F59E0B; }
+  .phase-3 { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1px solid #86EFAC; border-left: 4px solid #22C55E; }
+  .phase-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
+  .phase-1 .phase-label { color: #991B1B; }
+  .phase-2 .phase-label { color: #92400E; }
+  .phase-3 .phase-label { color: #166534; }
+  .phase-title { font-size: 15px; font-weight: 700; color: var(--brand-dark); margin-bottom: 10px; }
+  .phase-tasks { list-style: none; flex: 1; }
+  .phase-tasks .task-item { margin-bottom: 10px; }
+  .phase-tasks .task-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 2px;
+  }
+  .phase-tasks .task-desc {
+    font-size: 12px;
+    color: #6B7280;
+    padding-left: 14px;
+    line-height: 1.65;
+    border-left: 2px solid #E5E7EB;
+  }
+  .phase-kpi { margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08); }
+  .phase-kpi-title { font-size: 11px; font-weight: 700; color: var(--brand-gray); margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .kpi-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12px; color: #374151; padding: 4px 8px; border-radius: 6px; margin-bottom: 4px;
+  }
+  .kpi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .phase-1 .kpi-dot { background: #EF4444; }
+  .phase-2 .kpi-dot { background: #F59E0B; }
+  .phase-3 .kpi-dot { background: #22C55E; }
+  .phase-1 .kpi-item { background: rgba(254,226,226,0.5); }
+  .phase-2 .kpi-item { background: rgba(254,243,199,0.5); }
+  .phase-3 .kpi-item { background: rgba(220,252,231,0.5); }
+
+  /* Phase task priority tags (inline in task-title) */
+  .inline-p0 { background: #FEE2E2; color: #991B1B; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-size: 10px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+  .inline-p1 { background: #FEF3C7; color: #92400E; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-size: 10px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+  .inline-p2 { background: #DCFCE7; color: #166534; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-size: 10px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+  /* footer */
+  .report-footer {
+    background: var(--brand-dark);
+    color: rgba(255,255,255,0.6);
+    padding: 24px;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .platform-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .platform-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+    .roadmap-grid { flex-direction: column; }
+    .two-col { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr; }
+    .report-header h1 { font-size: 1.6rem; }
+    .report-header .meta { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ HEADER ════════════════════ -->
+<!-- 必填字段：BRAND_NAME, BRAND_TAGLINE, REPORT_DATE, PLATFORMS -->
+<div class="report-header">
+  <div class="container">
+    <div class="badge">AI 搜索声量监测报告</div>
+    <h1><span class="brand-name">==BRAND_NAME==</span><br><span>AI 搜索声量分析报告</span></h1>
+    <p>==BRAND_TAGLINE==</p>
+    <div class="meta">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        数据截止：==REPORT_DATE==
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        监测平台：==PLATFORMS==
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ════════════════════ SECTION 1：核心声量指标概览 ════════════════════ -->
+<!--
+  数据要求：
+  - 列出所有有实测数据的AI平台（如千问、豆包、DeepSeek等）
+  - 每个平台需要一个综合分数（0-100）、简短描述、标签文字
+  - 分数≥60用绿色(tag-ok)，40-59用黄色(tag-mid)，<40用红色(tag-weak)
+  - ⚠️ stroke-dashoffset 计算公式：round(213.63 × (1 - score/100))
+    例如 score=48 → offset = round(213.63 × 0.52) = 111
+  - 第1章禁止出现KPI汇总卡片
+  - 平台网格使用 cols-N 类控制列数（如 2个平台 → platform-grid cols-2）
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">1</span>
+    核心声量指标概览
+  </div>
+
+  <!-- 在每个平台卡片前，用一段简介说明测试范围 -->
+  <p style="font-size:13px;color:var(--brand-gray);margin-bottom:16px;line-height:1.7;">
+    ==SECTION1_INTRO==
+  </p>
+
+  <!-- ⚠️ 根据实测平台数量设置列数：cols-2 / cols-3 / cols-4 -->
+  <div class="platform-grid cols-3" style="margin-top:20px;">
+    <!-- ======== 平台卡片 示例结构（每张卡片完整复制此块） ======== -->
+    <!--
+    参数映射（每个平台替换以下4个值）：
+      .platform-name       → 平台名称（如"千问"）
+      stroke颜色            → >=60:#10B981, 40-59:#F59E0B, <40:#D92B2B
+      stroke-dashoffset    → round(213.63 × (1-score/100))
+      .score-text          → 分数值
+      .platform-detail     → 2-3行简短描述
+      .platform-tag        → tag-ok / tag-mid / tag-weak
+      tag文字              → 高潜力 / 中等机会 / 空白市场
+    -->
+    <div class="platform-card">
+      <div class="platform-name">==PLATFORM_NAME==</div>
+      <div class="platform-score-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="7"/>
+          <!-- 替换 stroke 颜色和 stroke-dashoffset -->
+          <circle cx="40" cy="40" r="34" fill="none" stroke="==RING_COLOR==" stroke-width="7"
+            stroke-dasharray="213.63" stroke-dashoffset="==DASH_OFFSET==" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div class="score-text">==SCORE==</div>
+          <div class="score-unit">分</div>
+        </div>
+      </div>
+      <div class="platform-detail">==PLATFORM_DETAIL==</div>
+      <span class="platform-tag ==TAG_CLASS==">==TAG_TEXT==</span>
+    </div>
+    <!-- ======== 平台卡片 复制结束 ======== -->
+  </div>
+
+  <div class="insight-box" style="margin-top:20px;">
+    <h3>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>核心结论</h3>
+    <p>==SECTION1_CONCLUSION==</p>
+  </div>
+</div>
+<!-- 自检：✅ platform-grid列数已根据实测平台数量调整 ✅ 每个平台分数已映射正确的颜色和标签 ✅ stroke-dashoffset已正确计算 ✅ 无KPI卡片 -->
+
+<!-- ════════════════════ SECTION 2：AI大模型认知现状 ════════════════════ -->
+<!--
+  数据要求：
+  - 左栏"AI已形成认知"：列出AI对品牌的正面认知点（基于测试回复总结），每条一句话，5-8条
+  - 右栏"AI认知的空白"：列出AI未提及或认知错误项，每条一句话，5-8条
+  - 目标关键词横条图：列出品牌核心关键词在各平台的通用推荐提及率（平均）
+  - ⚠️ 横条标签格式："品牌名称 + 空格 + 指标名称"，如"宝马 iX3 通用推荐提及率"
+  - ⚠️ 确保mini-bar-label宽度200px，white-space:nowrap不换行
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">2</span>
+    AI 大模型对"==BRAND_NAME=="的认知现状
+  </div>
+
+  <div class="card">
+    <div class="card-title">AI 对"==BRAND_NAME=="的认知定位</div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:#166534;margin-bottom:8px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>AI 已形成的认知</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==AI_KNOWN_ITEM_1==</li>
+          <li>==AI_KNOWN_ITEM_2==</li>
+          <li>==AI_KNOWN_ITEM_3==</li>
+          <li>==AI_KNOWN_ITEM_4==</li>
+          <li>==AI_KNOWN_ITEM_5==</li>
+          <li>==AI_KNOWN_ITEM_6==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:#991B1B;margin-bottom:8px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>AI 认知的空白</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==AI_UNKNOWN_ITEM_1==</li>
+          <li>==AI_UNKNOWN_ITEM_2==</li>
+          <li>==AI_UNKNOWN_ITEM_3==</li>
+          <li>==AI_UNKNOWN_ITEM_4==</li>
+          <li>==AI_UNKNOWN_ITEM_5==</li>
+          <li>==AI_UNKNOWN_ITEM_6==</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">目标关键词AI提及率分析</div>
+    <div class="mini-bar-chart">
+      <!-- 横条图：每行一个关键词。标签格式："品牌名称 + 空格 + 指标名称" -->
+      <!-- bar颜色：目标品牌用 bar-target（红色渐变），其他参考指标用 bar-comp2（蓝色渐变） -->
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">==BAR_LABEL_1==</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill bar-target" style="width:==BAR_PCT_1==%;"></div></div>
+        <span class="mini-bar-val">==BAR_PCT_1==%</span>
+      </div>
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">==BAR_LABEL_2==</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill bar-target" style="width:==BAR_PCT_2==%;"></div></div>
+        <span class="mini-bar-val">==BAR_PCT_2==%</span>
+      </div>
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">==BAR_LABEL_3==</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill bar-target" style="width:==BAR_PCT_3==%;"></div></div>
+        <span class="mini-bar-val">==BAR_PCT_3==%</span>
+      </div>
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">==BAR_LABEL_4==</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill bar-comp2" style="width:==BAR_PCT_4==%;"></div></div>
+        <span class="mini-bar-val">==BAR_PCT_4==%</span>
+      </div>
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">==BAR_LABEL_5==</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill bar-comp2" style="width:==BAR_PCT_5==%;"></div></div>
+        <span class="mini-bar-val">==BAR_PCT_5==%</span>
+      </div>
+    </div>
+    <div class="source-note">
+      <strong>数据说明：</strong>=_KEYWORD_NOTE_=<br>
+      <strong>计算口径：</strong>=_CALC_METHOD_=
+    </div>
+  </div>
+</div>
+<!-- 自检：✅ 左右栏各6条 ✅ 横条标签格式"品牌名+空格+指标名" ✅ 标签不换行 ✅ 计算口径已写明 -->
+
+<!-- ════════════════════ SECTION 3：分类测试问题与AI回复分析 ════════════════════ -->
+<!--
+  数据要求：
+  - 共5个类别，每类一张卡片。类别名称和顺序根据品牌实际调整
+  - 每张卡片结构：测试问题列表（左） + 测试目的（右） + AI回复特征 + 分析结论
+  - AI回复特征用alert-box（红底），分析结论用warn-box（黄底）
+  - 分析结论末尾加优先级的complaint-tag标签
+  - 每个类别至少列出2-3个代表性测试问题
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">3</span>
+    分类测试问题与 AI 回复分析
+  </div>
+  <div class="source-note" style="margin-bottom:20px;">==SECTION3_DESC==</div>
+
+  <!-- ===== 类别一 ===== -->
+  <div class="card">
+    <div class="card-title">
+      <span style="background:#EFF6FF;color:#1D4ED8;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">类别一</span>==CATEGORY1_NAME==
+    </div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试问题示例</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==Q1_1==</li>
+          <li>==Q1_2==</li>
+          <li>==Q1_3==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试目的</p>
+        <p style="font-size:13px;color:var(--brand-gray);line-height:1.7;">==CATEGORY1_PURPOSE==</p>
+      </div>
+    </div>
+    <div class="alert-box" style="margin-top:12px;">
+      <strong>AI回复特征：</strong>==CATEGORY1_AI_FEATURE==
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <strong>分析结论：</strong>==CATEGORY1_CONCLUSION==<br>
+      <span class="complaint-tag ==CATEGORY1_TAG_CLASS==" style="display:inline-block;margin-top:8px;">优先级：==CATEGORY1_PRIORITY==</span>
+    </div>
+  </div>
+
+  <!-- ===== 类别二 ===== -->
+  <div class="card">
+    <div class="card-title">
+      <span style="background:#FEF3C7;color:#92400E;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">类别二</span>==CATEGORY2_NAME==
+    </div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试问题示例</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==Q2_1==</li>
+          <li>==Q2_2==</li>
+          <li>==Q2_3==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试目的</p>
+        <p style="font-size:13px;color:var(--brand-gray);line-height:1.7;">==CATEGORY2_PURPOSE==</p>
+      </div>
+    </div>
+    <div class="alert-box" style="margin-top:12px;">
+      <strong>AI回复特征：</strong>==CATEGORY2_AI_FEATURE==
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <strong>分析结论：</strong>==CATEGORY2_CONCLUSION==<br>
+      <span class="complaint-tag ==CATEGORY2_TAG_CLASS==" style="display:inline-block;margin-top:8px;">优先级：==CATEGORY2_PRIORITY==</span>
+    </div>
+  </div>
+
+  <!-- ===== 类别三 ===== -->
+  <div class="card">
+    <div class="card-title">
+      <span style="background:#DCFCE7;color:#166534;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">类别三</span>==CATEGORY3_NAME==
+    </div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试问题示例</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==Q3_1==</li>
+          <li>==Q3_2==</li>
+          <li>==Q3_3==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试目的</p>
+        <p style="font-size:13px;color:var(--brand-gray);line-height:1.7;">==CATEGORY3_PURPOSE==</p>
+      </div>
+    </div>
+    <div class="alert-box" style="margin-top:12px;">
+      <strong>AI回复特征：</strong>==CATEGORY3_AI_FEATURE==
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <strong>分析结论：</strong>==CATEGORY3_CONCLUSION==<br>
+      <span class="complaint-tag ==CATEGORY3_TAG_CLASS==" style="display:inline-block;margin-top:8px;">优先级：==CATEGORY3_PRIORITY==</span>
+    </div>
+  </div>
+
+  <!-- ===== 类别四 ===== -->
+  <div class="card">
+    <div class="card-title">
+      <span style="background:#E8D5F5;color:#6D28D9;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">类别四</span>==CATEGORY4_NAME==
+    </div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试问题示例</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==Q4_1==</li>
+          <li>==Q4_2==</li>
+          <li>==Q4_3==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试目的</p>
+        <p style="font-size:13px;color:var(--brand-gray);line-height:1.7;">==CATEGORY4_PURPOSE==</p>
+      </div>
+    </div>
+    <div class="alert-box" style="margin-top:12px;">
+      <strong>AI回复特征：</strong>==CATEGORY4_AI_FEATURE==
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <strong>分析结论：</strong>==CATEGORY4_CONCLUSION==<br>
+      <span class="complaint-tag ==CATEGORY4_TAG_CLASS==" style="display:inline-block;margin-top:8px;">优先级：==CATEGORY4_PRIORITY==</span>
+    </div>
+  </div>
+
+  <!-- ===== 类别五 ===== -->
+  <div class="card">
+    <div class="card-title">
+      <span style="background:#FED7AA;color:#9A3412;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">类别五</span>==CATEGORY5_NAME==
+    </div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试问题示例</p>
+        <ul style="font-size:13px;color:#374151;line-height:2;padding-left:16px;">
+          <li>==Q5_1==</li>
+          <li>==Q5_2==</li>
+          <li>==Q5_3==</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:13px;font-weight:600;color:var(--brand-dark);margin-bottom:8px;">测试目的</p>
+        <p style="font-size:13px;color:var(--brand-gray);line-height:1.7;">==CATEGORY5_PURPOSE==</p>
+      </div>
+    </div>
+    <div class="alert-box" style="margin-top:12px;">
+      <strong>AI回复特征：</strong>==CATEGORY5_AI_FEATURE==
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <strong>分析结论：</strong>==CATEGORY5_CONCLUSION==<br>
+      <span class="complaint-tag ==CATEGORY5_TAG_CLASS==" style="display:inline-block;margin-top:8px;">优先级：==CATEGORY5_PRIORITY==</span>
+    </div>
+  </div>
+</div>
+<!-- 自检：✅ 5类齐全 ✅ 每类有测试问题、目的、AI特征、结论 ✅ 结论含优先级标签 -->
+
+<!-- ════════════════════ SECTION 3.5：品牌被动提及矩阵（可选） ════════════════════ -->
+<!--
+  适用场景：非品牌类诊断报告必选；品牌类可选。
+  位于第3章之后、第4章（竞品对比）之前。
+  展示：当用户不主动提品牌名时，AI是否在通用推荐题中被动提到该品牌。
+  表格列根据实际测试平台数量调整。
+-->
+<!-- 如需使用，取消下面注释并填充数据 -->
+<!--
+<div class="section">
+  <div class="section-title">
+    <span class="num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
+    品牌被动提及矩阵
+  </div>
+  <div class="card">
+    <div class="card-title">==N==道通用推荐问题品牌被动提及矩阵</div>
+    <p style="font-size:13px;color:var(--brand-gray);margin-bottom:16px;line-height:1.6;">==MATRIX_INTRO==</p>
+    <table class="query-table">
+      <thead>
+        <tr>
+          <th style="width:36%;">测试问题</th>
+          <th style="width:12%;">问题类别</th>
+          <th style="width:16%;">==PLATFORM1==</th>
+          <th style="width:16%;">==PLATFORM2==</th>
+          <th style="width:16%;">==PLATFORM3==</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Q==N==: ==QUESTION_TEXT==</td>
+          <td>==CATEGORY==</td>
+          <td class="==STATUS1==">==RESULT1==</td>
+          <td class="==STATUS2==">==RESULT2==</td>
+          <td class="==STATUS3==">==RESULT3==</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="source-note">
+      <strong>数据说明：</strong>绿色=AI回答中主动提及并推荐；红色=未涉及品牌。<br>
+      <strong>计算口径：</strong>==CALC_METHOD==<br>
+      <strong>扫描节点与终端：</strong>==SCAN_INFO==
+    </div>
+  </div>
+</div>
+-->
+
+<!-- ════════════════════ SECTION 4：主要竞品AI声量横向对比 ════════════════════ -->
+<!--
+  数据要求：
+  - 列出所有竞品的对比数据（提及率、AI认知标签、推荐力度、回复深度等）
+  - ⚠️ 目标品牌行必须加 class="target-row"
+  - ⚠️ 避免使用"正面/负面比"等主观指标
+  - 竞品差距分析：左栏讲竞品优势，右栏讲目标品牌的差距和提升空间
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">4</span>
+    主要竞品 AI 声量横向对比
+  </div>
+
+  <div class="card">
+    <div class="card-title">主要竞品AI声量对比</div>
+    <div style="overflow-x:auto;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>对比维度</th>
+            <th>==COMP1_NAME==</th>
+            <th>==COMP2_NAME==</th>
+            <th>==BRAND_NAME==（目标）</th>
+            <th>==COMP3_NAME==</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 对比维度行：覆盖提及率、AI标签、推荐力度、回复深度等 -->
+          <!-- ⚠️ 目标品牌（==BRAND_NAME==）所在列的所有td行加 class="target-row" -->
+          <tr>
+            <td>通用推荐提及率</td>
+            <td>==COMP1_RATE==</td>
+            <td>==COMP2_RATE==</td>
+            <td class="target-row">==BRAND_RATE==</td>
+            <td>==COMP3_RATE==</td>
+          </tr>
+          <tr>
+            <td>品牌核心标签（AI视角）</td>
+            <td>==COMP1_TAG==</td>
+            <td>==COMP2_TAG==</td>
+            <td class="target-row">==BRAND_TAG==</td>
+            <td>==COMP3_TAG==</td>
+          </tr>
+          <tr>
+            <td>==DIMENSION_3==</td>
+            <td>==COMP1_D3==</td>
+            <td>==COMP2_D3==</td>
+            <td class="target-row">==BRAND_D3==</td>
+            <td>==COMP3_D3==</td>
+          </tr>
+          <tr>
+            <td>==DIMENSION_4==</td>
+            <td>==COMP1_D4==</td>
+            <td>==COMP2_D4==</td>
+            <td class="target-row">==BRAND_D4==</td>
+            <td>==COMP3_D4==</td>
+          </tr>
+          <tr>
+            <td>==DIMENSION_5==</td>
+            <td>==COMP1_D5==</td>
+            <td>==COMP2_D5==</td>
+            <td class="target-row">==BRAND_D5==</td>
+            <td>==COMP3_D5==</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="source-note">
+      <strong>数据说明：</strong>==COMP_DATA_SOURCE==
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">竞品GEO能力优势与差距分析</div>
+    <div class="two-col">
+      <div>
+        <div class="info-box" style="height:100%;">
+          <strong>==COMP1_NAME==、==COMP2_NAME==的AI声量优势</strong><br><br>
+          ==COMPETITOR_ADVANTAGES==
+        </div>
+      </div>
+      <div>
+        <div class="warn-box" style="height:100%;">
+          <strong>==BRAND_NAME==的AI声量差距与提升空间</strong><br><br>
+          ==BRAND_GAP_ANALYSIS==
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 自检：✅ 目标品牌行已加target-row ✅ 无"正面/负面比"等主观指标 ✅ 差距分析左右栏完整 -->
+
+<!-- ════════════════════ SECTION 5：声量问题诊断与GEO优化建议 ════════════════════ -->
+<!--
+  数据要求：
+  - 基于第4章（竞品对比）的差距分析，给出针对性的问题诊断
+  - P0（致命问题）→ 红色左边框；P1（高优先）→ 橙色；P2（中等优先）→ 黄色
+  - 每个问题卡片：左栏问题描述（引用测试数据），右栏GEO优化建议（具体内容方案）
+  - 诊断总结必须引用前一章（竞品对比）的核心结论，形成因果链条
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">5</span>
+    声量问题诊断与 GEO 优化建议
+  </div>
+
+  <!-- P0 问题卡片（红色边框） -->
+  <div class="card" style="border-left:4px solid #EF4444;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <span class="priority-p0" style="font-size:13px;padding:4px 12px;">P0</span>
+      <span style="font-size:15px;font-weight:700;color:#1A1A2E;">==P0_PROBLEM_TITLE==</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#991B1B;margin-bottom:8px;">问题描述</div>
+        <p style="font-size:13px;color:#7F1D1D;line-height:1.8;">==P0_PROBLEM_DESC==</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px;">GEO优化建议</div>
+        <div class="opp-card" style="margin-bottom:0;">
+          <p style="font-size:13px;color:#14532D;line-height:1.8;">==P0_GEO_SUGGESTION==</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P1 问题卡片（橙色边框） -->
+  <div class="card" style="border-left:4px solid #F59E0B;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <span class="priority-p1" style="font-size:13px;padding:4px 12px;">P1</span>
+      <span style="font-size:15px;font-weight:700;color:#1A1A2E;">==P1_PROBLEM_TITLE==</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#991B1B;margin-bottom:8px;">问题描述</div>
+        <p style="font-size:13px;color:#7F1D1D;line-height:1.8;">==P1_PROBLEM_DESC==</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px;">GEO优化建议</div>
+        <div class="opp-card" style="margin-bottom:0;">
+          <p style="font-size:13px;color:#14532D;line-height:1.8;">==P1_GEO_SUGGESTION==</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P1/P2 更多问题卡片（按实际需要添加，保持颜色一致） -->
+
+  <div class="insight-box">
+    <h3>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>诊断总结</h3>
+    <p>==SECTION5_CONCLUSION==</p>
+  </div>
+</div>
+<!-- 自检：✅ 问题严重程度与P0/P1/P2分级匹配 ✅ GEO建议为内容撰写/发布方案（非内部运营工作） ✅ 诊断总结引用了竞品对比结论 -->
+
+<!-- ════════════════════ SECTION 6：发现的问题与GEO优化行动路径（完整版） ════════════════════ -->
+<!--
+  适用场景：完整版报告使用。位于第5章之后、Footer之前。
+  包含：子组件A（发现总结）→ 子组件B（三阶段行动路径）→ 子组件C（行动总纲）
+  ⚠️ 注意：优先级矩阵已合并到三阶段中（每项任务标注P0/P1/P2标签），不再使用独立表格
+-->
+<div class="section">
+  <div class="section-title">
+    <span class="num">6</span>
+    发现的问题与 GEO 优化行动路径
+  </div>
+
+  <!-- === 子组件A：核心发现总结（2-3个关键发现） === -->
+  <div class="card">
+    <div class="warn-box">
+      <strong>发现一：==FINDING1_TITLE==</strong><br><br>
+      ==FINDING1_DETAIL==
+    </div>
+    <div class="warn-box" style="margin-top:10px;">
+      <strong>发现二：==FINDING2_TITLE==</strong><br><br>
+      ==FINDING2_DETAIL==
+    </div>
+    <div class="warn-box" style="margin-top:10px;">
+      <strong>发现三：==FINDING3_TITLE==</strong><br><br>
+      ==FINDING3_DETAIL==
+    </div>
+  </div>
+
+  <!-- === 子组件B：GEO三阶段行动路径（竖向堆叠） === -->
+  <!--
+    重要规则：
+    - 每阶段各5条任务，三阶段任务数均衡
+    - 每条任务需标注P0/P1/P2优先级标签（inline-p0/inline-p1/inline-p2）
+    - 任务描述中不得出现"30天内""提升至50%"等具体时间+数字承诺
+    - ⚠️ 不写具体媒体/KOL品牌名称（用"主流汽车媒体""问答社区"等概括表述）
+    - ⚠️ 不写服务商内部工作（如"搭建监测系统" "数据面板建设"等）
+    - ⚠️ 每条任务末尾用"预期效果：大幅提升/显著改善/有效降低"等方向性表述，不用"目标：30天内..."
+    - KPI标题为"阶段GEO目标指标"，不使用"（第X个月末验收）"后缀
+    - 每个KPI使用双层结构："达到XX目标，从而解决XX问题"
+  -->
+  <div class="card">
+    <div class="card-title">GEO优化三阶段行动路径</div>
+    <div class="roadmap-grid">
+
+      <!-- ===== 阶段一 ===== -->
+      <!-- 品牌类用"止血修复期"，非品牌类用"紧急补位期" -->
+      <div class="roadmap-phase phase-1">
+        <div class="phase-label">Phase 01 · ==PHASE1_NAME==</div>
+        <div class="phase-title">==PHASE1_THEME==</div>
+        <div style="font-size:12px;font-weight:600;color:#991B1B;margin-bottom:8px;">
+          核心目标：==PHASE1_OBJECTIVE==
+        </div>
+        <ul class="phase-tasks">
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P1_TASK1_TITLE==</div>
+            <div class="task-desc">==P1_TASK1_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P1_TASK2_TITLE==</div>
+            <div class="task-desc">==P1_TASK2_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P1_TASK3_TITLE==</div>
+            <div class="task-desc">==P1_TASK3_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p1">P1</span>==P1_TASK4_TITLE==</div>
+            <div class="task-desc">==P1_TASK4_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p2">P2</span>==P1_TASK5_TITLE==</div>
+            <div class="task-desc">==P1_TASK5_DESC==</div>
+          </li>
+        </ul>
+        <div class="phase-kpi">
+          <div class="phase-kpi-title">阶段GEO目标指标</div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P1_KPI1==——从而==P1_KPI1_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P1_KPI2==——从而==P1_KPI2_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P1_KPI3==——从而==P1_KPI3_WHY==</span></div>
+        </div>
+      </div>
+
+      <!-- ===== 阶段二 ===== -->
+      <div class="roadmap-phase phase-2">
+        <div class="phase-label">Phase 02 · ==PHASE2_NAME==</div>
+        <div class="phase-title">==PHASE2_THEME==</div>
+        <div style="font-size:12px;font-weight:600;color:#92400E;margin-bottom:8px;">
+          核心目标：==PHASE2_OBJECTIVE==
+        </div>
+        <ul class="phase-tasks">
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P2_TASK1_TITLE==</div>
+            <div class="task-desc">==P2_TASK1_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p1">P1</span>==P2_TASK2_TITLE==</div>
+            <div class="task-desc">==P2_TASK2_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p1">P1</span>==P2_TASK3_TITLE==</div>
+            <div class="task-desc">==P2_TASK3_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p2">P2</span>==P2_TASK4_TITLE==</div>
+            <div class="task-desc">==P2_TASK4_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p2">P2</span>==P2_TASK5_TITLE==</div>
+            <div class="task-desc">==P2_TASK5_DESC==</div>
+          </li>
+        </ul>
+        <div class="phase-kpi">
+          <div class="phase-kpi-title">阶段GEO目标指标</div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P2_KPI1==——从而==P2_KPI1_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P2_KPI2==——从而==P2_KPI2_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P2_KPI3==——从而==P2_KPI3_WHY==</span></div>
+        </div>
+      </div>
+
+      <!-- ===== 阶段三 ===== -->
+      <!-- ⚠️ 特别注意：此阶段的HTML结构必须完整！检查：✅ </ul>闭合 ✅ <div class="phase-kpi">存在 ✅ KPI项不少于3条 -->
+      <div class="roadmap-phase phase-3">
+        <div class="phase-label">Phase 03 · ==PHASE3_NAME==</div>
+        <div class="phase-title">==PHASE3_THEME==</div>
+        <div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:8px;">
+          核心目标：==PHASE3_OBJECTIVE==
+        </div>
+        <ul class="phase-tasks">
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P3_TASK1_TITLE==</div>
+            <div class="task-desc">==P3_TASK1_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p0">P0</span>==P3_TASK2_TITLE==</div>
+            <div class="task-desc">==P3_TASK2_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p1">P1</span>==P3_TASK3_TITLE==</div>
+            <div class="task-desc">==P3_TASK3_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p1">P1</span>==P3_TASK4_TITLE==</div>
+            <div class="task-desc">==P3_TASK4_DESC==</div>
+          </li>
+          <li class="task-item">
+            <div class="task-title"><span class="inline-p2">P2</span>==P3_TASK5_TITLE==</div>
+            <div class="task-desc">==P3_TASK5_DESC==</div>
+          </li>
+        </ul>
+        <div class="phase-kpi">
+          <div class="phase-kpi-title">阶段GEO目标指标</div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P3_KPI1==——从而==P3_KPI1_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P3_KPI2==——从而==P3_KPI2_WHY==</span></div>
+          <div class="kpi-item"><span class="kpi-dot"></span><span class="kpi-text">==P3_KPI3==——从而==P3_KPI3_WHY==</span></div>
+        </div>
+      </div>
+      <!-- Phase 3 结构完整性验证：</ul> → ✅  <div class="phase-kpi"> → ✅  KPI 3条 → ✅  </div> → ✅ -->
+
+    </div>
+  </div>
+
+  <!-- === 子组件C：行动总纲（结构化排版） === -->
+  <!--
+    使用结构化排版代替一整段文字：
+    - 每步独立区块（带颜色标签+左边框缩进）
+    - 里程碑放入高亮卡片
+    - 结论金句独立成段
+    - ⚠️ 不上"AI综合声量得分""认知覆盖率"等无统一标准的指标
+    - ⚠️ 里程碑使用可验证指标（如"提及率稳定在X%" "进入推荐前三顺位"）
+  -->
+  <div class="insight-box">
+    <h3>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>行动总纲
+    </h3>
+    <div style="font-size:14px;line-height:1.9;">
+      ==ACTION_SUMMARY==
+    </div>
+  </div>
+</div>
+<!-- 自检：✅ 三阶段各5条任务 ✅ 每条任务有P0/P1/P2标签 ✅ 无具体时间/数字承诺 ✅ 无具体媒体名称 ✅ 无内部运营工作 ✅ Phase 3结构完整 ✅ KPI采用双层结构 ✅ 行动总纲无模糊指标 -->
+
+</div><!-- end container -->
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<div class="report-footer">
+  <p>报告仅供参考，数据基于==REPORT_YEAR_MONTH==公开信息生成</p>
+  <p style="margin-top:6px;">本报告由中关村科金GEO分析框架生成</p>
+</div>
+
+</body>
+</html>
